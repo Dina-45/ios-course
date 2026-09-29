@@ -28,11 +28,14 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   static const int _defaultLikes = 1;
+  static const int _defaultDislikes = 0;
   static const int _defaultFollowers = 10;
 
   bool isFollowing = false;
   bool isLiked = false;
+  bool isDisliked = false;
   int likes = _defaultLikes;
+  int dislikes = _defaultDislikes;
   int followers = _defaultFollowers;
 
   void _toggleFollow() {
@@ -44,8 +47,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _toggleLike() {
     setState(() {
-      isLiked = !isLiked;
-      likes += isLiked ? 1 : -1;
+      if (isLiked) {
+        isLiked = false;
+        likes--;
+      } else {
+        isLiked = true;
+        likes++;
+        if (isDisliked) {
+          isDisliked = false;
+          dislikes--;
+        }
+      }
+    });
+  }
+
+  void _toggleDislike() {
+    setState(() {
+      if (isDisliked) {
+        isDisliked = false;
+        dislikes--;
+      } else {
+        isDisliked = true;
+        dislikes++;
+        if (isLiked) {
+          isLiked = false;
+          likes--;
+        }
+      }
     });
   }
 
@@ -53,7 +81,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       isFollowing = false;
       isLiked = false;
+      isDisliked = false;
       likes = _defaultLikes;
+      dislikes = _defaultDislikes;
       followers = _defaultFollowers;
     });
   }
@@ -92,7 +122,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
                 const Text(
                   'Dina',
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -103,12 +132,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: TextStyle(color: colors.outline),
                 ),
                 const SizedBox(height: 20),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     _StatItem(label: 'Followers', value: followers),
                     _StatItem(label: 'Likes', value: likes),
+                    _StatItem(label: 'Dislikes', value: dislikes),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -127,28 +156,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                 ),
                 const SizedBox(height: 12),
-
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: _toggleLike,
                         icon: Icon(
-                          isLiked ? Icons.favorite : Icons.favorite_border,
-                          color: isLiked ? Colors.red : null,
+                          isLiked ? Icons.thumb_up : Icons.thumb_up_outlined,
+                          color: Colors.green,
                         ),
                         label: Text(isLiked ? 'Liked' : 'Like'),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: TextButton.icon(
-                        onPressed: _reset,
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Reset'),
+                      child: OutlinedButton.icon(
+                        onPressed: _toggleDislike,
+                        icon: Icon(
+                          isDisliked
+                              ? Icons.thumb_down
+                              : Icons.thumb_down_outlined,
+                          color: Colors.red,
+                        ),
+                        label: Text(isDisliked ? 'Disliked' : 'Dislike'),
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton.icon(
+                    onPressed: _reset,
+                    icon: const Icon(Icons.refresh),
+                    label: const Text('Reset'),
+                  ),
                 ),
               ],
             ),
